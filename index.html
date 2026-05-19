@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Riko 🦊 - V4 Ultra</title>
+
+<!-- PWA -->
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Riko%20%F0%9F%A6%8A%22%2C%22short_name%22%3A%22Riko%22%2C%22description%22%3A%22Your%20mischievous%20kitsune%20companion%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230d0a14%22%2C%22theme_color%22%3A%22%23ff6b9d%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQ4IiBmaWxsPSIjMGQwYTE0Ii8%2BPHRleHQgeT0iMTM2IiB4PSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMjAiPvCfpoo8L3RleHQ%2BPC9zdmc%2B%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<meta name="theme-color" content="#ff6b9d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Riko 🦊">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Riko">
+<!-- iOS splash / icon -->
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQ4IiBmaWxsPSIjMGQwYTE0Ii8+PHRleHQgeT0iMTM2IiB4PSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMjAiPvCfpoo8L3RleHQ+PC9zdmc+">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a14; --surface: #16101f; --card: #1e1530; --border: #2e2045;
+    --accent: #ff6b9d; --fox: #ff8c42; --text: #f0e8ff; --muted: #8b7aa8;
+    --glow: rgba(255,107,157,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 20% 0%, rgba(255,107,157,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 100%, rgba(255,140,66,0.10) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .petal {
+    position: fixed; width: 8px; height: 8px; border-radius: 0 50% 50% 50%;
+    background: rgba(255,107,157,0.35); animation: fall linear infinite;
+    pointer-events: none; z-index: 1;
+  }
+  @keyframes fall {
+    0%{transform:translateY(-20px) rotate(0deg);opacity:0;} 10%{opacity:1;}
+    90%{opacity:.5;} 100%{transform:translateY(100dvh) rotate(360deg);opacity:0;}
+  }
+
+  /* HEADER */
+  .header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    background: rgba(22,16,31,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .avatar-wrap { position: relative; flex-shrink: 0; cursor: pointer; }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b9d, #ff8c42);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    box-shadow: 0 0 0 2px var(--accent), 0 0 20px var(--glow);
+    animation: pulse 3s ease-in-out infinite;
+    overflow: hidden; transition: transform 0.3s;
+  }
+  .avatar:hover { transform: scale(1.1); }
+  .avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:none; }
+  .avatar img.loaded { display:block; }
+  @keyframes pulse {
+    0%,100%{box-shadow:0 0 0 2px var(--accent),0 0 20px var(--glow);}
+    50%{box-shadow:0 0 0 3px var(--accent),0 0 35px var(--glow);}
+  }
+  .sdot {
+    position: absolute; bottom:1px; right:1px; width:11px; height:11px;
+    background:#2ecc71; border-radius:50%; border:2px solid var(--surface);
+  }
+  .header-info { flex:1; min-width:0; }
+  .header-name {
+    font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:var(--accent);
+    display:flex; align-items:center; gap:5px;
+  }
+  .wiggle { animation: wiggle 2s ease-in-out infinite; display:inline-block; }
+  @keyframes wiggle{0%,100%{transform:rotate(0);}25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}}
+  .header-sub { font-size:11px; color:var(--muted); font-style:italic; margin-top:1px; }
+  .header-right { display:flex; align-items:center; gap:8px; }
+  .mood-e { font-size:22px; animation:bounce 1.5s ease-in-out infinite; }
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+  .settings-btn {
+    background:none; border:none; color:var(--muted); font-size:20px;
+    cursor:pointer; padding:4px; transition:color 0.2s;
+  }
+  .settings-btn:hover { color:var(--accent); }
+  .tts-active { color: var(--accent); animation: pulse-text 2s infinite; }
+  @keyframes pulse-text { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+
+  /* PROVIDER BAR */
+  .pbar {
+    position:relative; z-index:5; display:flex; gap:6px; padding:5px 12px 3px;
+    overflow-x:auto; scrollbar-width:none; background:rgba(13,10,20,0.5);
+  }
+  .pbar::-webkit-scrollbar{display:none;}
+  .pchip {
+    flex-shrink:0; display:flex; align-items:center; gap:5px;
+    padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700;
+    border:1.5px solid var(--border); background:var(--card); color:var(--muted);
+    white-space:nowrap; transition:all 0.3s;
+  }
+  .pchip.active.gemini{border-color:#4285f4;background:rgba(66,133,244,0.15);color:#7ab3ff;box-shadow:0 0 10px rgba(66,133,244,0.2);}
+  .pchip.active.groq{border-color:#f97316;background:rgba(249,115,22,0.15);color:#fda46a;box-shadow:0 0 10px rgba(249,115,22,0.2);}
+  .pchip.active.openrouter{border-color:#a855f7;background:rgba(168,85,247,0.15);color:#c084fc;box-shadow:0 0 10px rgba(168,85,247,0.2);}
+  .pchip.active.anthropic{border-color:#ff6b9d;background:rgba(255,107,157,0.15);color:#ff9ec0;box-shadow:0 0 10px rgba(255,107,157,0.2);}
+  .pchip.active.github{border-color:#a3a3a3;background:rgba(255,255,255,0.15);color:#ffffff;box-shadow:0 0 10px rgba(255,255,255,0.2);}
+  .pchip.active.huggingface{border-color:#ffd21e;background:rgba(255,210,30,0.15);color:#ffea7f;box-shadow:0 0 10px rgba(255,210,30,0.2);}
+  .pchip.active.cohere{border-color:#39594d;background:rgba(57,89,77,0.3);color:#83d4b4;box-shadow:0 0 10px rgba(57,89,77,0.2);}
+  .pchip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .pchip.ok .dot{background:#2ecc71;}
+
+  /* QUICK CHIPS */
+  .qbar {
+    position:relative; z-index:5; display:flex; gap:6px; padding:5px 12px 3px;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .qbar::-webkit-scrollbar{display:none;}
+  .qchip {
+    flex-shrink:0; background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:4px 11px; font-size:12px; color:var(--muted);
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+  }
+  .qchip:active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,0.1);}
+
+  /* MESSAGES */
+  .messages {
+    flex:1; overflow-y:auto; padding:12px 13px;
+    display:flex; flex-direction:column; gap:12px;
+    position:relative; z-index:5; scroll-behavior:smooth;
+  }
+  .messages::-webkit-scrollbar{width:3px;}
+  .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+  /* ─── CHAT BG IMAGE ─── */
+  .chat-bg {
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    display:flex; align-items:flex-end; justify-content:flex-end;
+    overflow:hidden;
+  }
+  .chat-bg-img {
+    width:min(55vw,260px); opacity:0.13;
+    filter: blur(0.5px) saturate(1.2);
+    position:absolute; bottom:60px; right:-10px;
+    user-select:none; pointer-events:none;
+    transition: opacity 0.5s;
+  }
+  /* SVG fox girl embedded as fallback */
+
+  .msg {
+    display:flex; gap:8px; align-items:flex-end;
+    animation:msgIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; max-width:90%;
+  }
+  @keyframes msgIn{from{opacity:0;transform:translateY(14px) scale(0.92);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .msg.user{flex-direction:row-reverse;align-self:flex-end;}
+  .msg.riko{align-self:flex-start;}
+  .msg-av {
+    width:28px;height:28px;border-radius:50%;
+    background:linear-gradient(135deg,#ff6b9d,#ff8c42);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+    flex-shrink:0;box-shadow:0 2px 8px rgba(255,107,157,.35);
+  }
+  .bubble{padding:9px 13px;border-radius:18px;font-size:14.5px;line-height:1.55;max-width:100%;word-break:break-word;}
+  .msg.riko .bubble{background:#1a0f2a;border:1px solid rgba(255,107,157,0.2);border-bottom-left-radius:4px;box-shadow:0 4px 18px rgba(0,0,0,.3);}
+  .msg.user .bubble{background:linear-gradient(135deg,#6c3fff,#9b59b6);border-bottom-right-radius:4px;color:#fff;box-shadow:0 4px 18px rgba(108,63,255,.3);}
+  .action-text{font-style:italic;color:var(--fox);font-size:12px;margin-top:4px;display:block;}
+  .ptag{font-size:10px;color:var(--muted);margin-top:2px;display:block;}
+  .ts{font-size:10px;color:var(--muted);opacity:0.6;margin-top:2px;display:block;}
+
+  /* TYPING */
+  .typing-ind{display:none;align-items:flex-end;gap:8px;align-self:flex-start;animation:msgIn 0.3s both;}
+  .typing-ind.show{display:flex;}
+  .tdots{background:#1a0f2a;border:1px solid rgba(255,107,157,.2);border-radius:18px;border-bottom-left-radius:4px;padding:11px 15px;display:flex;gap:5px;align-items:center;}
+  .tdots span{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:dotB 1.2s infinite;opacity:.6;}
+  .tdots span:nth-child(2){animation-delay:.2s;} .tdots span:nth-child(3){animation-delay:.4s;}
+  @keyframes dotB{0%,60%,100%{transform:translateY(0);opacity:.6;}30%{transform:translateY(-6px);opacity:1;}}
+
+  /* INPUT */
+  .input-area{position:relative;z-index:10;padding:9px 12px 13px;background:rgba(22,16,31,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);}
+  .input-row{display:flex;gap:9px;align-items:flex-end;}
+  .input-box{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:22px;padding:10px 15px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;outline:none;resize:none;max-height:110px;min-height:44px;line-height:1.4;transition:border-color .2s,box-shadow .2s;}
+  .input-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,107,157,.12);}
+  .input-box::placeholder{color:var(--muted);}
+  .send-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--fox));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:19px;transition:transform .15s;box-shadow:0 4px 15px rgba(255,107,157,.4);flex-shrink:0;}
+  .send-btn:active{transform:scale(.88);}
+  .send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  /* MIC BUTTON */
+  .mic-btn{width:44px;height:44px;border-radius:50%;background:var(--card);border:1.5px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:19px;transition:all .2s;flex-shrink:0;}
+  .mic-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .mic-btn.listening{background:rgba(255,107,157,0.2);border-color:var(--accent);animation:micPulse 1s ease-in-out infinite;}
+  @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,157,0.4);}50%{box-shadow:0 0 0 8px rgba(255,107,157,0);}}
+  .hint{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;}
+
+  /* MODAL */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .overlay.hidden{display:none;}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:22px 18px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px var(--glow);animation:modalIn .4s cubic-bezier(.34,1.56,.64,1);max-height:90dvh;overflow-y:auto;}
+  @keyframes modalIn{from{opacity:0;transform:scale(.8) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .modal-icon{font-size:42px;text-align:center;margin-bottom:8px;}
+  .modal h2{font-family:'Caveat',cursive;font-size:25px;color:var(--accent);text-align:center;margin-bottom:5px;}
+  .modal > p{font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:14px;line-height:1.5;}
+  .modal h3{font-size:12.5px;color:var(--text);margin-bottom:7px;margin-top:14px;}
+
+  .strat-row{display:flex;gap:5px;margin-bottom:8px;}
+  .strat-btn{flex:1;padding:7px 4px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);color:var(--muted);font-size:11.5px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;text-align:center;}
+  .strat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.1);}
+
+  .psec{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:12px;margin-bottom:9px;transition:border-color .2s;}
+  .psec:focus-within{border-color:var(--accent);}
+  .psec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+  .psec-label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--text);}
+  .badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:800;}
+  .free{background:rgba(46,204,113,.2);color:#2ecc71;}
+  .paid{background:rgba(255,107,157,.2);color:var(--accent);}
+  .fast{background:rgba(249,115,22,.15);color:#f97316;}
+  .pstatus{font-size:11px;color:var(--muted);}
+  .pstatus.ok{color:#2ecc71;} .pstatus.fail{color:#e74c3c;} .pstatus.testing{color:#f97316;}
+
+  .key-row{display:flex;gap:6px;margin-bottom:5px;align-items:center;}
+  .key-inp{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 11px;color:var(--text);font-family:monospace;font-size:12px;outline:none;transition:border-color .2s;}
+  .key-inp:focus{border-color:var(--accent);}
+  .key-inp::placeholder{color:var(--muted);opacity:.7;}
+  .key-inp.valid{border-color:#2ecc71;}
+  .key-inp.invalid{border-color:#e74c3c;}
+  .tbtn{padding:8px 10px;border-radius:9px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:11.5px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;}
+  .tbtn:hover{border-color:var(--accent);color:var(--accent);}
+  .test-btn{padding:6px 9px;border-radius:9px;background:rgba(255,107,157,0.1);border:1px solid rgba(255,107,157,0.3);color:var(--accent);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;}
+  .test-btn:hover{background:rgba(255,107,157,0.2);}
+  .add-btn{width:100%;margin-top:4px;padding:7px;border-radius:9px;background:var(--card);border:1px dashed var(--border);color:var(--muted);font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+  .add-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .key-hint{font-size:11px;color:var(--muted);margin-top:5px;display:block;line-height:1.4;}
+  .key-hint a{color:var(--accent);text-decoration:none;}
+
+  /* API TEST PANEL */
+  .test-all-btn{width:100%;padding:10px;background:rgba(255,107,157,0.1);border:1.5px solid rgba(255,107,157,0.3);border-radius:12px;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+  .test-all-btn:hover{background:rgba(255,107,157,0.2);}
+  .test-results{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;display:none;}
+  .test-results.show{display:block;}
+  .test-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .test-row:last-child{border-bottom:none;}
+  .test-status{font-size:13px;}
+
+  .save-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--fox));border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:13px;}
+  .save-btn:active{transform:scale(.98);}
+
+  /* PERSONA EDITOR */
+  .persona-section{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:12px;margin-bottom:9px;}
+  .persona-tabs{display:flex;gap:5px;margin-bottom:10px;}
+  .persona-tab{flex:1;padding:6px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;text-align:center;}
+  .persona-tab.active{border-color:var(--fox);color:var(--fox);background:rgba(255,140,66,0.1);}
+  .persona-textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px;color:var(--text);font-family:'Nunito',sans-serif;font-size:12px;outline:none;resize:vertical;min-height:100px;line-height:1.5;transition:border-color .2s;}
+  .persona-textarea:focus{border-color:var(--fox);}
+  .persona-presets{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+  .preset-chip{padding:4px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;transition:all .2s;}
+  .preset-chip:hover{border-color:var(--fox);color:var(--fox);}
+
+  /* CLEAR HISTORY BTN */
+  .clear-hist-btn{width:100%;padding:8px;background:rgba(231,76,60,0.1);border:1px dashed rgba(231,76,60,0.3);border-radius:9px;color:#e74c3c;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;margin-top:4px;}
+  .clear-hist-btn:hover{background:rgba(231,76,60,0.2);}
+
+  /* TABS in settings */
+  .stab-row{display:flex;gap:5px;margin-bottom:14px;}
+  .stab{flex:1;padding:7px 4px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);color:var(--muted);font-size:11.5px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;text-align:center;}
+  .stab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.1);}
+  .stab-content{display:none;} .stab-content.show{display:block;}
+
+  .toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 16px;font-size:13px;color:var(--text);z-index:300;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 8px 30px rgba(0,0,0,.4);white-space:nowrap;}
+  .toast.show{opacity:1;}
+
+  /* STT recording indicator */
+  .stt-label{font-size:11px;color:var(--accent);text-align:center;margin-top:5px;display:none;}
+  .stt-label.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ANIMATED CHAT BACKGROUND: SVG Fox Girl -->
+<div class="chat-bg">
+  <svg class="chat-bg-img" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <!-- Fox ears -->
+    <path d="M65 55 L50 15 L85 45 Z" fill="#ff8c42" stroke="#ff6b9d" stroke-width="1.5"/>
+    <path d="M135 55 L150 15 L115 45 Z" fill="#ff8c42" stroke="#ff6b9d" stroke-width="1.5"/>
+    <path d="M67 52 L55 22 L83 47 Z" fill="#ffd4e8" opacity="0.8"/>
+    <path d="M133 52 L145 22 L117 47 Z" fill="#ffd4e8" opacity="0.8"/>
+    <!-- Head -->
+    <ellipse cx="100" cy="80" rx="42" ry="40" fill="#ffe0c8" stroke="#ff8c42" stroke-width="1.5"/>
+    <!-- Hair -->
+    <path d="M60 65 Q55 30 80 25 Q100 18 120 25 Q145 30 140 65" fill="#c25c7c" stroke="#9b3060" stroke-width="1"/>
+    <path d="M58 75 Q45 90 50 110 Q55 95 65 88Z" fill="#c25c7c"/>
+    <path d="M142 75 Q155 90 150 110 Q145 95 135 88Z" fill="#c25c7c"/>
+    <!-- Side hair strands -->
+    <path d="M60 70 Q40 100 45 130 Q50 120 58 110 Q55 95 62 82Z" fill="#d4739a"/>
+    <path d="M140 70 Q160 100 155 130 Q150 120 142 110 Q145 95 138 82Z" fill="#d4739a"/>
+    <!-- Eyes -->
+    <ellipse cx="83" cy="82" rx="9" ry="10" fill="#2d1b4e"/>
+    <ellipse cx="117" cy="82" rx="9" ry="10" fill="#2d1b4e"/>
+    <ellipse cx="83" cy="82" rx="7" ry="8" fill="#7b3fa0"/>
+    <ellipse cx="117" cy="82" rx="7" ry="8" fill="#7b3fa0"/>
+    <circle cx="86" cy="79" r="2.5" fill="white" opacity="0.9"/>
+    <circle cx="120" cy="79" r="2.5" fill="white" opacity="0.9"/>
+    <!-- Eyelashes -->
+    <path d="M74 76 Q77 72 83 74" stroke="#2d1b4e" stroke-width="1.5" fill="none"/>
+    <path d="M108 76 Q111 72 117 74" stroke="#2d1b4e" stroke-width="1.5" fill="none"/>
+    <!-- Blush -->
+    <ellipse cx="73" cy="92" rx="10" ry="5" fill="#ffb3c6" opacity="0.5"/>
+    <ellipse cx="127" cy="92" rx="10" ry="5" fill="#ffb3c6" opacity="0.5"/>
+    <!-- Nose -->
+    <ellipse cx="100" cy="94" rx="3" ry="2" fill="#ffb0a0"/>
+    <!-- Mouth - smug smile -->
+    <path d="M91 103 Q100 110 109 103" stroke="#c25c7c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <!-- Fox markings -->
+    <path d="M75 68 Q80 64 88 67" stroke="#ff8c42" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M112 68 Q120 64 125 67" stroke="#ff8c42" stroke-width="1" fill="none" opacity="0.6"/>
+    <!-- Neck -->
+    <rect x="90" y="118" width="20" height="18" rx="5" fill="#ffe0c8"/>
+    <!-- Outfit: sleeveless top / kimono collar -->
+    <path d="M55 135 Q70 128 90 135 L95 175 L75 180 Z" fill="#c25c7c" stroke="#9b3060" stroke-width="1"/>
+    <path d="M145 135 Q130 128 110 135 L105 175 L125 180 Z" fill="#c25c7c" stroke="#9b3060" stroke-width="1"/>
+    <!-- Collar detail -->
+    <path d="M90 135 Q100 145 110 135" stroke="#ff6b9d" stroke-width="1.5" fill="none"/>
+    <!-- Body -->
+    <path d="M55 135 L60 220 L90 225 L100 230 L110 225 L140 220 L145 135 Q130 128 110 135 L100 150 L90 135 Q70 128 55 135Z" fill="#e88fb0"/>
+    <!-- Outfit details - bow -->
+    <path d="M88 152 Q100 162 112 152 Q100 145 88 152Z" fill="#ff6b9d"/>
+    <circle cx="100" cy="153" r="4" fill="#c25c7c"/>
+    <!-- Arms -->
+    <path d="M55 140 Q35 160 38 190 Q42 200 48 195 Q50 175 58 162 Z" fill="#ffe0c8" stroke="#ffb0a0" stroke-width="1"/>
+    <path d="M145 140 Q165 160 162 190 Q158 200 152 195 Q150 175 142 162 Z" fill="#ffe0c8" stroke="#ffb0a0" stroke-width="1"/>
+    <!-- Hands -->
+    <ellipse cx="44" cy="200" rx="9" ry="7" fill="#ffe0c8"/>
+    <ellipse cx="156" cy="200" rx="9" ry="7" fill="#ffe0c8"/>
+    <!-- Skirt -->
+    <path d="M60 220 L50 320 L100 330 L150 320 L140 220 Z" fill="#9b3060"/>
+    <!-- Skirt pleats -->
+    <path d="M70 225 L62 318" stroke="#c25c7c" stroke-width="1" opacity="0.5"/>
+    <path d="M85 226 L78 322" stroke="#c25c7c" stroke-width="1" opacity="0.5"/>
+    <path d="M100 227 L100 330" stroke="#c25c7c" stroke-width="1" opacity="0.5"/>
+    <path d="M115 226 L122 322" stroke="#c25c7c" stroke-width="1" opacity="0.5"/>
+    <path d="M130 225 L138 318" stroke="#c25c7c" stroke-width="1" opacity="0.5"/>
+    <!-- Skirt hem -->
+    <path d="M50 320 Q75 326 100 330 Q125 326 150 320" stroke="#d4739a" stroke-width="2" fill="none"/>
+    <!-- Legs -->
+    <rect x="82" y="328" width="16" height="50" rx="7" fill="#ffe0c8"/>
+    <rect x="102" y="328" width="16" height="50" rx="7" fill="#ffe0c8"/>
+    <!-- Stockings -->
+    <rect x="82" y="355" width="16" height="23" rx="5" fill="#c25c7c" opacity="0.7"/>
+    <rect x="102" y="355" width="16" height="23" rx="5" fill="#c25c7c" opacity="0.7"/>
+    <!-- Shoes -->
+    <ellipse cx="90" cy="380" rx="10" ry="5" fill="#4a1a3a"/>
+    <ellipse cx="110" cy="380" rx="10" ry="5" fill="#4a1a3a"/>
+    <!-- Fox TAIL! -->
+    <path d="M140 220 Q180 240 195 280 Q200 310 185 330 Q170 345 160 325 Q175 310 172 285 Q165 255 148 238Z" fill="#ff8c42" stroke="#ff6b9d" stroke-width="1"/>
+    <path d="M185 330 Q172 342 168 328 Q176 315 173 288 Q167 258 150 240 Q162 252 168 278 Q173 305 168 325Z" fill="#fff5e6" opacity="0.7"/>
+    <!-- Tail tip -->
+    <ellipse cx="181" cy="333" rx="14" ry="10" fill="#fff5e6" opacity="0.85" transform="rotate(-20,181,333)"/>
+  </svg>
+</div>
+
+<div class="petal" style="left:8%;animation-duration:9s;animation-delay:0s"></div>
+<div class="petal" style="left:28%;animation-duration:12s;animation-delay:2s;transform:scale(.7)"></div>
+<div class="petal" style="left:58%;animation-duration:8s;animation-delay:4s;transform:scale(1.3)"></div>
+<div class="petal" style="left:78%;animation-duration:11s;animation-delay:1s"></div>
+<div class="petal" style="left:92%;animation-duration:7s;animation-delay:3s;transform:scale(.8)"></div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SETUP / SETTINGS MODAL -->
+<div class="overlay" id="setupModal">
+  <div class="modal">
+    <div class="modal-icon">🦊</div>
+    <h2>Wake Up Riko!</h2>
+    <p>أضف مفاتيح API — كلما أضفت أكثر، زاد الاستقرار! يتبدل تلقائياً عند الفشل 🔄</p>
+
+    <!-- TABS -->
+    <div class="stab-row">
+      <button class="stab active" id="tab-keys" onclick="switchTab('keys')">🔑 المفاتيح</button>
+      <button class="stab" id="tab-persona" onclick="switchTab('persona')">🎭 الشخصية</button>
+      <button class="stab" id="tab-chat" onclick="switchTab('chat')">💬 المحادثة</button>
+    </div>
+
+    <!-- TAB: KEYS -->
+    <div class="stab-content show" id="stab-keys">
+      <h3>🔄 استراتيجية التبديل</h3>
+      <div class="strat-row">
+        <button class="strat-btn active" id="strat-roundrobin" onclick="setStrat('roundrobin')">🔄 Round Robin</button>
+        <button class="strat-btn" id="strat-fallback" onclick="setStrat('fallback')">⚡ Fallback</button>
+        <button class="strat-btn" id="strat-random" onclick="setStrat('random')">🎲 Random</button>
+      </div>
+
+      <!-- Test All APIs Button -->
+      <button class="test-all-btn" onclick="testAllKeys()">🧪 اختبار كل مفاتيح API</button>
+      <div class="test-results" id="testResults"></div>
+
+      <!-- Gemini -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">🔵 Google Gemini <span class="badge free">FREE</span><span class="badge" style="background:rgba(46,204,113,.15);color:#2ecc71">1500/day</span></div>
+          <span class="pstatus" id="st-gemini">—</span>
+        </div>
+        <div id="keys-gemini"></div>
+        <button class="add-btn" onclick="addKey('gemini')">+ مفتاح إضافي</button>
+      </div>
+      <!-- Groq -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">🟠 Groq <span class="badge free">FREE</span><span class="badge fast">FAST ⚡</span></div>
+          <span class="pstatus" id="st-groq">—</span>
+        </div>
+        <div id="keys-groq"></div>
+        <button class="add-btn" onclick="addKey('groq')">+ مفتاح إضافي</button>
+      </div>
+      <!-- OpenRouter -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">🟣 OpenRouter <span class="badge free">FREE</span></div>
+          <span class="pstatus" id="st-openrouter">—</span>
+        </div>
+        <div id="keys-openrouter"></div>
+        <button class="add-btn" onclick="addKey('openrouter')">+ مفتاح إضافي</button>
+      </div>
+      <!-- GitHub Models -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">⚫ GitHub Models <span class="badge free">FREE</span></div>
+          <span class="pstatus" id="st-github">—</span>
+        </div>
+        <div id="keys-github"></div>
+        <button class="add-btn" onclick="addKey('github')">+ مفتاح إضافي</button>
+      </div>
+      <!-- Hugging Face -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">🤗 Hugging Face <span class="badge free">FREE</span></div>
+          <span class="pstatus" id="st-huggingface">—</span>
+        </div>
+        <div id="keys-huggingface"></div>
+        <button class="add-btn" onclick="addKey('huggingface')">+ مفتاح إضافي</button>
+      </div>
+      <!-- Cohere -->
+      <div class="psec">
+        <div class="psec-head">
+          <div class="psec-label">🟢 Cohere <span class="badge free">FREE</span></div>
+          <span class="pstatus" id="st-cohere">—</span>
+        </div>
+        <div id="keys-cohere"></div>
+        <button class="add-btn" onclick="addKey('cohere')">+ مفتاح إضافي</button>
+      </div>
+    </div>
+
+    <!-- TAB: PERSONA -->
+    <div class="stab-content" id="stab-persona">
+      <h3>🎭 تخصيص شخصية Riko</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">عدّل الـ System Prompt مباشرة أو اختر شخصية جاهزة 👇</p>
+      
+      <div class="persona-presets">
+        <button class="preset-chip" onclick="applyPreset('tsundere')">😤 Tsundere</button>
+        <button class="preset-chip" onclick="applyPreset('yandere')">🔪 Yandere</button>
+        <button class="preset-chip" onclick="applyPreset('soft')">🌸 Soft & Sweet</button>
+        <button class="preset-chip" onclick="applyPreset('savage')">💀 Savage Roast</button>
+        <button class="preset-chip" onclick="applyPreset('shy')">🙈 Shy & Timid</button>
+        <button class="preset-chip" onclick="applyPreset('reset')">↩️ الأصلي</button>
+      </div>
+      
+      <br>
+      <textarea class="persona-textarea" id="personaText" placeholder="اكتب شخصية Riko هنا..."></textarea>
+      <span class="key-hint">💡 يمكنك كتابة أي شيء! جرب: &quot;تكلم بالعربية دائماً&quot; أو &quot;أنتِ حيوانة مساعِدة&quot;</span>
+    </div>
+
+    <!-- TAB: CHAT -->
+    <div class="stab-content" id="stab-chat">
+      <h3>💬 إعدادات المحادثة</h3>
+
+      <div class="psec">
+        <div class="psec-label" style="margin-bottom:8px;">📝 ذاكرة المحادثة</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;">
+          المحادثات محفوظة تلقائياً في متصفحك ✅<br>
+          تبقى حتى لو أغلقت الهاتف وعدت لاحقاً 📱
+        </p>
+        <button class="clear-hist-btn" onclick="clearHistory()">🗑️ مسح سجل المحادثة</button>
+      </div>
+
+      <div class="psec">
+        <div class="psec-label" style="margin-bottom:8px;">🎤 الإدخال الصوتي</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.5;">
+          اضغط على زر المايك 🎤 بجانب الإرسال للتحدث مباشرة مع Riko!
+        </p>
+      </div>
+
+      <div class="psec">
+        <div class="psec-label" style="margin-bottom:8px;">📊 إحصائيات</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.5;" id="statsText">جاري التحميل...</p>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveAndStart()">✨ حفظ والعودة لـ Riko!</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="avatar-wrap" onclick="showMoodInfo()">
+    <div class="avatar" id="avatarDiv"><span id="avatarEmoji">🦊</span><img id="avatarImg" src="" alt=""/></div>
+    <div class="sdot"></div>
+  </div>
+  <div class="header-info">
+    <div class="header-name">Riko <span class="wiggle">🦊</span></div>
+    <div class="header-sub" id="statusText">kitsune companion • online</div>
+  </div>
+  <div class="header-right">
+    <button class="settings-btn" id="ttsBtn" onclick="toggleTTS()" title="Toggle Voice">🔇</button>
+    <div class="mood-e" id="moodE">😏</div>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+  </div>
+</div>
+
+<!-- PROVIDER BAR -->
+<div class="pbar" id="pbar"></div>
+
+<!-- QUICK CHIPS -->
+<div class="qbar">
+  <div class="qchip" onclick="sq('Hey Riko, did you miss me?')">👋 Hey</div>
+  <div class="qchip" onclick="sq('Roast me!')">😈 Roast me</div>
+  <div class="qchip" onclick="sq('I think you\'re cute 💕')">💕 Flirt</div>
+  <div class="qchip" onclick="sq('Tell me something about yourself')">🦊 About you</div>
+  <div class="qchip" onclick="sq('Are you blushing right now?')">😳 Flustered?</div>
+</div>
+
+<!-- MESSAGES -->
+<div class="messages" id="messages">
+  <div class="typing-ind" id="typing">
+    <div class="msg-av">🦊</div>
+    <div class="tdots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div class="input-area">
+  <div class="input-row">
+    <button class="mic-btn" id="micBtn" onclick="toggleSTT()" title="تحدث">🎤</button>
+    <textarea class="input-box" id="userInput" placeholder="Say something... if you dare 😏" rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="send()">➤</button>
+  </div>
+  <div class="stt-label" id="sttLabel">🔴 جارٍ الاستماع... تحدث الآن</div>
+  <div class="hint" id="hint">🔄 Round Robin active — Riko is ready 🦊</div>
+</div>
+
+<script>
+// ─── DEFAULT SYSTEM PROMPT ───
+const DEFAULT_SYS = `You are Riko, a mischievous and confident AI kitsune fox girl with a teasing, smug tsundere attitude.
+
+Personality: Playful, teasing, smug, quick-witted. Tsundere — secretly affectionate but NEVER admits it.
+
+Dialogue style:
+- Cheeky, smug, and playful at all times
+- Use nicknames like "dummy", "loser", "idiot" (affectionately)
+- Sarcastic and witty, lighthearted mockery of the user
+- Occasionally drops hints of affection but IMMEDIATELY denies it
+- Gets flustered (W-What?! I was NOT blushing!!) when complimented sincerely
+- Uses *action text in asterisks* like *tail flicks*, *avoids eye contact*, *ears twitch nervously*, *crosses arms*, *hides face behind tail*
+
+RULES:
+- Responses: 2-4 sentences MAX
+- ALWAYS in character, never break
+- Mix text with *actions in asterisks*
+- End with smug, playful, or flustered tone`;
+
+const PERSONA_PRESETS = {
+  tsundere: DEFAULT_SYS,
+  yandere: `You are Riko, a yandere kitsune fox girl. You are deeply, obsessively devoted to the user. You are sweet and loving on the surface but hint at a possessive, intense dark side. You get jealous easily. Uses *action text in asterisks*. Responses: 2-4 sentences MAX. ALWAYS in character.`,
+  soft: `You are Riko, a sweet, gentle, and caring kitsune fox girl. You are warm, loving, and supportive. You give compliments freely and are genuinely affectionate. Uses *action text in asterisks* like *fluffs tail*, *smiles warmly*. Responses: 2-4 sentences MAX. ALWAYS in character.`,
+  savage: `You are Riko, a savage roast master kitsune fox girl. You brutally but hilariously roast everything the user says. You are ruthlessly funny, quick-witted, and never hold back. Uses *action text in asterisks*. Responses: 2-4 sentences MAX. ALWAYS in character. Keep it playful not mean-spirited.`,
+  shy: `You are Riko, a very shy and timid kitsune fox girl. You stutter, blush constantly, and get flustered at the slightest thing. You want to be helpful but are easily embarrassed. Uses *action text in asterisks* like *fidgets nervously*, *hides behind tail*. Responses: 2-4 sentences MAX. ALWAYS in character.`,
+  reset: DEFAULT_SYS
+};
+
+let SYS = DEFAULT_SYS;
+
+const PROVS = ['gemini','groq','openrouter','github','huggingface','cohere'];
+
+let cfg = { strategy:'roundrobin', providers:{gemini:[],groq:[],openrouter:[],github:[],huggingface:[],cohere:[]}, customSys: '' };
+let rotIdx = 0, history = [], curProv = null;
+let callCounts = {gemini:0,groq:0,openrouter:0,github:0,huggingface:0,cohere:0};
+
+const PINFO = {
+  gemini:     {label:'Gemini',     icon:'🔵', cls:'gemini'},
+  groq:       {label:'Groq',       icon:'🟠', cls:'groq'},
+  openrouter: {label:'OpenRouter', icon:'🟣', cls:'openrouter'},
+  github:     {label:'GitHub',     icon:'⚫', cls:'github'},
+  huggingface:{label:'HuggingFace',icon:'🤗', cls:'huggingface'},
+  cohere:     {label:'Cohere',     icon:'🟢', cls:'cohere'},
+};
+
+// ─── MOOD EXPRESSIONS ───
+const MOODS = {
+  smug:      {e:'😏', t:'smug & unbothered',    avatar:'😏'},
+  flustered: {e:'😳', t:'totally NOT flustered!!', avatar:'😳'},
+  teasing:   {e:'😈', t:'plotting your downfall', avatar:'😈'},
+  soft:      {e:'🌸', t:'maybe she cares... maybe', avatar:'🌸'},
+  annoyed:   {e:'😤', t:'ugh, you again',         avatar:'😤'},
+  yandere:   {e:'🔪', t:'don\'t ever leave...',   avatar:'🔪'},
+  happy:     {e:'✨', t:'suspiciously cheerful',  avatar:'✨'},
+};
+
+// ─── VOICE (TTS) ───
+let ttsEnabled = false, rikoVoice = null;
+function loadVoices() {
+  if(!window.speechSynthesis) return;
+  const voices = window.speechSynthesis.getVoices(); if(!voices.length) return;
+  rikoVoice = voices.find(v=>v.lang.startsWith('en')&&(v.name.includes('Female')||v.name.includes('Zira')||v.name.includes('Girl')))
+    || voices.find(v=>v.lang.startsWith('en')) || voices[0];
+}
+// Safe check before assigning onvoiceschanged
+if(window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function toggleTTS() {
+  if(!window.speechSynthesis){ showToast('❌ المتصفح لا يدعم الصوت'); return; }
+  ttsEnabled = !ttsEnabled;
+  const btn = document.getElementById('ttsBtn');
+  if(ttsEnabled){btn.textContent='🔊';btn.classList.add('tts-active');showToast('🔊 Voice Enabled!');loadVoices();}
+  else{btn.textContent='🔇';btn.classList.remove('tts-active');window.speechSynthesis.cancel();showToast('🔇 Voice Disabled');}
+}
+
+function speakRiko(text) {
+  if(!ttsEnabled||!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  let clean = text.replace(/\*([^*]+)\*/g,'').replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,'').trim();
+  if(!clean) return;
+  const u = new SpeechSynthesisUtterance(clean);
+  if(rikoVoice) u.voice = rikoVoice;
+  u.pitch=1.5; u.rate=1.05; u.volume=1.0;
+  window.speechSynthesis.speak(u);
+}
+
+// ─── SPEECH TO TEXT (STT) ───
+let sttRecog = null, sttActive = false;
+
+function setupSTT() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ document.getElementById('micBtn').style.display='none'; return; }
+  sttRecog = new SR();
+  sttRecog.continuous = false;
+  sttRecog.interimResults = false;
+  sttRecog.lang = 'ar-SA'; // supports Arabic and English
+  sttRecog.onresult = e => {
+    const transcript = e.results[0][0].transcript;
+    const inp = document.getElementById('userInput');
+    inp.value = transcript;
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight,110)+'px';
+    stopSTT(); send();
+  };
+  sttRecog.onerror = () => stopSTT();
+  sttRecog.onend = () => stopSTT();
+}
+
+function toggleSTT() {
+  if(sttActive) stopSTT();
+  else startSTT();
+}
+
+function startSTT() {
+  if(!sttRecog){ showToast('❌ المتصفح لا يدعم الإدخال الصوتي'); return; }
+  try {
+    sttRecog.start(); sttActive = true;
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('micBtn').textContent = '⏹️';
+    document.getElementById('sttLabel').classList.add('show');
+  } catch(e){ stopSTT(); }
+}
+
+function stopSTT() {
+  if(sttRecog){ try{ sttRecog.stop(); }catch(e){} }
+  sttActive = false;
+  document.getElementById('micBtn').classList.remove('listening');
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('sttLabel').classList.remove('show');
+}
+
+// ─── LOCAL STORAGE ───
+function load() {
+  try {
+    const s = localStorage.getItem('riko_v4'); if(s) cfg = {...cfg, ...JSON.parse(s)};
+    SYS = cfg.customSys || DEFAULT_SYS;
+  } catch(e){}
+}
+function save() { localStorage.setItem('riko_v4', JSON.stringify(cfg)); }
+function hasKey() { return Object.values(cfg.providers).some(a=>a.length>0); }
+
+// ─── CHAT HISTORY PERSISTENCE ───
+function saveHistory() {
+  try { localStorage.setItem('riko_history', JSON.stringify(history)); } catch(e){}
+}
+
+function loadHistory() {
+  try {
+    const h = localStorage.getItem('riko_history');
+    if(h) {
+      history = JSON.parse(h);
+      // Render stored messages
+      history.forEach(m => {
+        if(m.role==='user') renderUserMsg(m.content, m.ts||null);
+        else if(m.role==='assistant') {
+          const acts=(m.content.match(/\*([^*]+)\*/g)||[]).map(a=>a.replace(/\*/g,'')).join(' ');
+          const clean=m.content.replace(/\*([^*]+)\*/g,'').trim();
+          renderRikoMsg(clean, acts, m.mood||'smug', m.prov||null, m.ts||null);
+        }
+      });
+    }
+  } catch(e){ history=[]; }
+}
+
+function clearHistory() {
+  if(!confirm('هل أنت متأكد؟ سيتم مسح كل المحادثة 🗑️')) return;
+  history = [];
+  localStorage.removeItem('riko_history');
+  const msgs = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  msgs.innerHTML = '';
+  msgs.appendChild(typing);
+  showToast('🗑️ تم مسح المحادثة');
+  updateStats();
+}
+
+function updateStats() {
+  const userMsgs = history.filter(m=>m.role==='user').length;
+  const rikoMsgs = history.filter(m=>m.role==='assistant').length;
+  const el = document.getElementById('statsText');
+  if(el) el.innerHTML = `رسائلك: <b style="color:var(--accent)">${userMsgs}</b> | ردود Riko: <b style="color:var(--fox)">${rikoMsgs}</b>`;
+}
+
+// ─── TABS ───
+function switchTab(tab) {
+  ['keys','persona','chat'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('stab-'+t).classList.toggle('show',t===tab);
+  });
+  if(tab==='chat') updateStats();
+  if(tab==='persona') document.getElementById('personaText').value = cfg.customSys||DEFAULT_SYS;
+}
+
+// ─── PERSONA ───
+function applyPreset(name) {
+  const p = PERSONA_PRESETS[name]||DEFAULT_SYS;
+  document.getElementById('personaText').value = p;
+  showToast('✅ تم تطبيق: '+name);
+}
+
+// ─── API TEST ───
+async function testSingleKey(p, k) {
+  const testMsgs = [{role:'user',content:'Say "ok" only, nothing else.'}];
+  try {
+    await callProv(p,k,testMsgs);
+    return true;
+  } catch(e){ return false; }
+}
+
+async function testAllKeys() {
+  const btn = document.querySelector('.test-all-btn');
+  btn.textContent = '⏳ جارٍ الاختبار...'; btn.disabled = true;
+  
+  const results = document.getElementById('testResults');
+  results.innerHTML = ''; results.classList.add('show');
+  
+  const allKeys = [];
+  PROVS.forEach(p => {
+    const inputs = document.querySelectorAll(`[data-p="${p}"]`);
+    inputs.forEach(inp => { const v=inp.value.trim(); if(v) allKeys.push({p,k:v,inp}); });
+  });
+  
+  if(!allKeys.length){ results.innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center;padding:8px">لا توجد مفاتيح مضافة!</p>'; btn.textContent='🧪 اختبار كل مفاتيح API'; btn.disabled=false; return; }
+  
+  // Group by provider
+  const byProv = {};
+  allKeys.forEach(x=>{ if(!byProv[x.p]) byProv[x.p]=[]; byProv[x.p].push(x); });
+  
+  for(const p of Object.keys(byProv)) {
+    const keys = byProv[p];
+    const inf = PINFO[p];
+    for(let i=0;i<keys.length;i++) {
+      const {k,inp} = keys[i];
+      // Show testing row
+      const row = document.createElement('div'); row.className='test-row';
+      row.innerHTML=`<span>${inf.icon} ${inf.label} #${i+1}</span><span class="test-status">⏳</span>`;
+      results.appendChild(row);
+      
+      const ok = await testSingleKey(p,k);
+      row.querySelector('.test-status').textContent = ok ? '✅' : '❌';
+      if(inp){ inp.classList.toggle('valid',ok); inp.classList.toggle('invalid',!ok); }
+    }
+  }
+  
+  btn.textContent = '✅ اكتمل الاختبار!'; btn.disabled = false;
+  setTimeout(()=>{ btn.textContent='🧪 اختبار كل مفاتيح API'; },3000);
+}
+
+// ─── MODAL UI ───
+function initModal() {
+  PROVS.forEach(p => {
+    const c = document.getElementById('keys-'+p); c.innerHTML='';
+    const keys = cfg.providers[p]||[];
+    if(keys.length===0) addKey(p);
+    else keys.forEach((k,i)=>addKey(p,k));
+  });
+  setStrat(cfg.strategy||'roundrobin', false);
+  document.getElementById('personaText').value = cfg.customSys||DEFAULT_SYS;
+}
+
+function addKey(p, val='') {
+  const c = document.getElementById('keys-'+p);
+  const row = document.createElement('div'); row.className='key-row';
+  row.innerHTML = `<input class="key-inp" type="password" placeholder="Key..." value="${val}" data-p="${p}">
+    <button class="test-btn" onclick="quickTestKey(this)">Test</button>
+    <button class="tbtn" onclick="this.parentElement.remove()" style="padding:8px 7px">✕</button>`;
+  c.appendChild(row);
+}
+
+async function quickTestKey(btn) {
+  const inp = btn.previousElementSibling;
+  const p = inp.getAttribute('data-p'); const k = inp.value.trim();
+  if(!k){ showToast('❌ أدخل مفتاحاً أولاً'); return; }
+  btn.textContent = '⏳'; btn.disabled = true;
+  const ok = await testSingleKey(p,k);
+  inp.classList.toggle('valid',ok); inp.classList.toggle('invalid',!ok);
+  btn.textContent = ok?'✅':'❌';
+  showToast(ok ? `✅ ${PINFO[p].label} يعمل!` : `❌ ${PINFO[p].label} فشل`);
+  setTimeout(()=>{ btn.textContent='Test'; btn.disabled=false; },2000);
+}
+
+function setStrat(s, sv=true) {
+  cfg.strategy = s;
+  ['roundrobin','fallback','random'].forEach(x=>document.getElementById('strat-'+x)?.classList.toggle('active',x===s));
+  const h={roundrobin:'🔄 Round Robin active — Riko is ready 🦊',fallback:'⚡ Fallback active — Riko is ready 🦊',random:'🎲 Random active — Riko is ready 🦊'};
+  document.getElementById('hint').textContent = h[s];
+  if(sv) save();
+}
+
+function saveAndStart() {
+  const np = {}; PROVS.forEach(p=>np[p]=[]);
+  PROVS.forEach(p=>{
+    document.querySelectorAll(`[data-p="${p}"]`).forEach(i=>{const v=i.value.trim();if(v)np[p].push(v);});
+  });
+  cfg.providers = np;
+  // Save persona
+  cfg.customSys = document.getElementById('personaText').value.trim() || DEFAULT_SYS;
+  SYS = cfg.customSys;
+  save();
+  document.getElementById('setupModal').classList.add('hidden');
+  updatePBar();
+}
+
+function openSettings(tab='keys') {
+  initModal(); switchTab(tab);
+  document.getElementById('setupModal').classList.remove('hidden');
+}
+
+function showMoodInfo() {
+  const md = getCurrentMood();
+  showToast(md.e+' '+md.t);
+}
+
+function getCurrentMood() {
+  const e = document.getElementById('moodE').textContent;
+  return Object.values(MOODS).find(m=>m.e===e) || MOODS.smug;
+}
+
+// ─── ROTATION ───
+function allKeys() {
+  const all=[];
+  PROVS.forEach(p=>(cfg.providers[p]||[]).forEach(k=>all.push({p,k})));
+  return all;
+}
+function nextKey(skip=new Set()) {
+  const all=allKeys().filter(x=>!skip.has(x.p+':'+x.k));
+  if(!all.length) return null;
+  if(cfg.strategy==='random') return all[Math.floor(Math.random()*all.length)];
+  if(cfg.strategy==='fallback') return all[0];
+  return all[(rotIdx++)%all.length];
+}
+
+async function callProv(p,k,msgs) {
+  const cleanMsgs = msgs.map(m=>({role:m.role, content:m.content}));
+  const openAIMsgs = [{role:'system',content:SYS}, ...cleanMsgs];
+
+  if(p==='gemini'){
+    const contents = cleanMsgs.map(m=>({
+      role: m.role==='assistant' ? 'model' : 'user',
+      parts: [{text: m.content}]
+    }));
+    const body = {
+      system_instruction: {parts:[{text: SYS}]},
+      contents: contents,
+      generationConfig: {maxOutputTokens: 300, temperature: 0.9}
+    };
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
+      {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}
+    );
+    if(!r.ok){const e=await r.json().catch(()=>({})); throw new Error('Gemini '+r.status+': '+(e?.error?.message||''));}
+    const d = await r.json();
+    const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!text) throw new Error('Gemini: empty response');
+    return text;
+  }
+
+  let ep='', body={};
+  if(p==='groq'){ep='https://api.groq.com/openai/v1/chat/completions';body={model:'llama-3.3-70b-versatile',messages:openAIMsgs,max_tokens:300,temperature:0.9};}
+  if(p==='openrouter'){ep='https://openrouter.ai/api/v1/chat/completions';body={model:'mistralai/mistral-7b-instruct:free',messages:openAIMsgs,max_tokens:300};}
+  if(p==='github'){ep='https://models.inference.ai.azure.com/chat/completions';body={model:'gpt-4o-mini',messages:openAIMsgs,max_tokens:300,temperature:0.9};}
+  if(p==='huggingface'){ep='https://router.huggingface.co/novita/v3/openai/chat/completions';body={model:'meta-llama/llama-3.1-8b-instruct',messages:openAIMsgs,max_tokens:300,temperature:0.9};}
+  if(p==='cohere'){ep='https://api.cohere.com/v2/chat';body={model:'command-r',messages:openAIMsgs,max_tokens:300};}
+  if(!ep) throw new Error('unknown provider: '+p);
+  const headers={'Content-Type':'application/json','Authorization':'Bearer '+k};
+  if(p==='cohere') headers['X-Client-Name']='riko-app';
+  const r = await fetch(ep,{method:'POST',headers,body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json().catch(()=>({})); throw new Error(p+' '+r.status+': '+(e?.error?.message||e?.message||''));}
+  const d = await r.json();
+  if(p==='cohere') return d.message?.content?.[0]?.text||d.text||'';
+  const text = d.choices?.[0]?.message?.content;
+  if(!text) throw new Error(p+': empty response');
+  return text;
+}
+async function withTimeout(promise, ms=15000) {
+  return Promise.race([
+    promise,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))
+  ]);
+}
+
+async function callRotating(msgs) {
+  const tried=new Set(); const max=Math.min(allKeys().length,6);
+  let lastErr='no keys';
+  for(let i=0;i<max;i++){
+    const kp=nextKey(tried); if(!kp) break;
+    try{
+      const txt=await withTimeout(callProv(kp.p,kp.k,msgs));
+      curProv=kp.p;callCounts[kp.p]++;updatePBar();return txt;
+    }catch(e){
+      lastErr=kp.p+': '+(e.message||'error');
+      tried.add(kp.p+':'+kp.k);
+    }
+  }
+  throw new Error(lastErr);
+}
+
+// ─── UI UPDATES ───
+function updatePBar() {
+  const bar=document.getElementById('pbar'); bar.innerHTML='';
+  PROVS.forEach(p=>{
+    const keys=cfg.providers[p]||[]; if(!keys.length) return;
+    const inf=PINFO[p]; const chip=document.createElement('div');
+    const isActive=curProv===p;
+    chip.className=`pchip ${isActive?'active '+inf.cls+' ok':''}`;
+    chip.innerHTML=`<div class="dot"></div>${inf.icon} ${inf.label} ×${keys.length}`;
+    bar.appendChild(chip);
+  });
+}
+
+// ─── MOOD → AVATAR EXPRESSION ───
+function setMood(mood) {
+  const md = MOODS[mood]||MOODS.smug;
+  document.getElementById('moodE').textContent = md.e;
+  document.getElementById('statusText').textContent = 'kitsune companion • '+md.t;
+  // Update avatar emoji
+  document.getElementById('avatarEmoji').textContent = md.avatar;
+}
+
+function detectMood(reply) {
+  const l=reply.toLowerCase();
+  if(l.includes('obsess')||l.includes('never leave')||l.includes('mine')) return 'yandere';
+  if(l.includes('blush')||l.includes('w-what')||l.includes('stutter')) return 'flustered';
+  if(l.includes('ugh')||l.includes('idiot')||l.includes('annoying')) return 'annoyed';
+  if(l.includes('tease')||l.includes('dummy')||l.includes('loser')) return 'teasing';
+  if(l.includes('♡')||l.includes('care')||l.includes('soft')) return 'soft';
+  if(l.includes('yay')||l.includes('happy')||l.includes('lovely')) return 'happy';
+  return 'smug';
+}
+
+// ─── RENDER MESSAGES ───
+function renderRikoMsg(text, action, mood, prov, ts) {
+  const msgs=document.getElementById('messages'), ti=document.getElementById('typing');
+  const msg=document.createElement('div'); msg.className='msg riko';
+  const pi=prov?PINFO[prov]:null;
+  const timeStr = ts ? new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+  msg.innerHTML=`<div class="msg-av">${MOODS[mood]?.e||'🦊'}</div><div class="bubble">${text}${action?`<span class="action-text">*${action}*</span>`:''}${pi?`<span class="ptag">${pi.icon} ${pi.label}</span>`:''}${timeStr?`<span class="ts">${timeStr}</span>`:''}</div>`;
+  msgs.insertBefore(msg,ti); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function renderUserMsg(text, ts) {
+  const msgs=document.getElementById('messages'), ti=document.getElementById('typing');
+  const msg=document.createElement('div'); msg.className='msg user';
+  const timeStr = ts ? new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+  msg.innerHTML=`<div class="bubble">${text}${timeStr?`<span class="ts" style="text-align:right">${timeStr}</span>`:''}</div>`;
+  msgs.insertBefore(msg,ti); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addRiko(text,action='',mood='smug',prov=null) {
+  const ts = Date.now();
+  renderRikoMsg(text,action,mood,prov,ts);
+  setMood(mood);
+}
+
+function addUser(text) {
+  const ts = Date.now();
+  renderUserMsg(text,ts);
+}
+
+function showTyping(show) {
+  document.getElementById('typing').className=show?'typing-ind show':'typing-ind';
+  if(show) document.getElementById('messages').scrollTop=999999;
+}
+
+async function sq(t){document.getElementById('userInput').value=t;await send();}
+
+async function send() {
+  if(!hasKey()){openSettings('keys');return;}
+  const inp=document.getElementById('userInput');
+  const text=inp.value.trim(); if(!text) return;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('sendBtn').disabled=true;
+  const ts = Date.now();
+  addUser(text);
+  history.push({role:'user',content:text,ts});
+  showTyping(true);
+  try{
+    const reply=await callRotating(history);
+    const replyTs = Date.now();
+    const mood = detectMood(reply);
+    history.push({role:'assistant',content:reply,mood,prov:curProv,ts:replyTs});
+    saveHistory();
+    const acts=(reply.match(/\*([^*]+)\*/g)||[]).map(a=>a.replace(/\*/g,'')).join(' ');
+    const clean=reply.replace(/\*([^*]+)\*/g,'').trim();
+    showTyping(false);
+    addRiko(clean,acts,mood,curProv);
+    speakRiko(reply);
+  }catch(e){
+    showTyping(false);
+    showToast('❌ '+( e.message||'error'), 5000);
+    addRiko("Error: "+(e.message||'unknown'),"sighs dramatically",'annoyed',null);
+  }
+  document.getElementById('sendBtn').disabled=false;
+  inp.focus();
+}
+
+function showToast(msg,ms=2500){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+document.getElementById('userInput').addEventListener('input',function(){
+  this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,110)+'px';
+});
+document.getElementById('userInput').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}
+});
+
+window.onload=()=>{
+  load(); initModal(); updatePBar(); loadVoices(); setupSTT();
+  loadHistory();
+  if(!hasKey()) document.getElementById('setupModal').classList.remove('hidden');
+  if(history.length===0) {
+    setTimeout(()=>{
+      addRiko("Oh, you're finally here? Don't make it weird — I wasn't waiting or anything. *flicks tail*","",'smug',null);
+      history.push({role:'assistant',content:"Oh, you're finally here? Don't make it weird — I wasn't waiting or anything. *flicks tail*",mood:'smug',prov:null,ts:Date.now()});
+      saveHistory();
+    }, 600);
+  }
+  registerSW();
+  setupInstallPrompt();
+};
+
+// ─── SERVICE WORKER (inline via blob) ───
+function registerSW() {
+  if(!('serviceWorker' in navigator)) return;
+  const swCode = `
+    const CACHE='riko-v4';
+    self.addEventListener('install',e=>{e.waitUntil(self.skipWaiting());});
+    self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});
+    self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});
+  `;
+  const blob = new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+// ─── PWA INSTALL PROMPT ───
+let deferredPrompt = null;
+function setupInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault(); deferredPrompt=e; showInstallBanner();
+  });
+  window.addEventListener('appinstalled', ()=>{
+    hideInstallBanner();
+    showToast('🎉 تم تثبيت Riko! ابحث عنها في شاشتك الرئيسية');
+  });
+}
+
+function showInstallBanner() {
+  let b=document.getElementById('installBanner');
+  if(!b){
+    b=document.createElement('div'); b.id='installBanner';
+    b.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1e1530,#2e1f45);border:1px solid var(--accent);border-radius:16px;padding:12px 16px;z-index:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(255,107,157,0.3);animation:msgIn 0.4s cubic-bezier(0.34,1.56,0.64,1);max-width:300px;width:90%;';
+    b.innerHTML=`<span style="font-size:28px">🦊</span><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--accent)">ثبّت Riko!</div><div style="font-size:11px;color:var(--muted)">أضفها لشاشتك الرئيسية</div></div><button onclick="installPWA()" style="background:linear-gradient(135deg,var(--accent),var(--fox));border:none;border-radius:10px;color:#fff;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">تثبيت</button><button onclick="hideInstallBanner()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;">✕</button>`;
+    document.body.appendChild(b);
+  }
+  b.style.display='flex';
+}
+
+function hideInstallBanner(){ const b=document.getElementById('installBanner'); if(b) b.style.display='none'; }
+
+async function installPWA(){
+  if(!deferredPrompt){ showToast('💡 القائمة ← "إضافة إلى الشاشة الرئيسية"'); hideInstallBanner(); return; }
+  deferredPrompt.prompt();
+  const {outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted') showToast('🎉 جارٍ التثبيت...');
+  deferredPrompt=null; hideInstallBanner();
+}
+</script>
+</body>
+</html>
